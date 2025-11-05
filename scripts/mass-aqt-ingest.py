@@ -1,8 +1,9 @@
-from datetime import date, timedelta
+from datetime import datetime, date, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 import argparse
 import subprocess
+from zoneinfo import ZoneInfo
 
 def run_one(args, site):
     with open(f"{args.log_path}logs/{site}.log", "w") as log:
@@ -35,6 +36,9 @@ def run_one(args, site):
 def main(args):
     MAX_WORKERS = 6
 
+    print("\nStarting Mass-AQT Ingest: ", datetime.now(ZoneInfo("UTC")).strftime('%Y-%m-%dT%H:%M:00Z'))
+    print("\n")
+
     # Define a set of days to process
     SITES = ["NEIU",
              "NU", 
@@ -56,6 +60,8 @@ def main(args):
         for fut in as_completed(futures):
             rc, d = fut.result()
             print(f"{d}: {'OK' if rc==0 else f'FAILED (rc={rc})'}")
+
+    print("\nFinished Mass-AQT Ingest: ", datetime.now(ZoneInfo("UTC")).strftime('%Y-%m-%dT%H:%M:00Z'))
 
 if __name__ == '__main__':
     #Parsing the command line
